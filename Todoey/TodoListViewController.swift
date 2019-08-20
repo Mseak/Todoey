@@ -15,6 +15,13 @@ class TodoListViewController: UITableViewController {
     */
     var itemArray = ["Find Mike", "Buy eggos", "Destroy Demogorgon"]
     
+    /*
+     La siguiente Variable esta creada para iniciar la clase acerca de informacion persistente. este metodo de retencion de
+     informacion esta hecho para retener pequeños bancos de informacion en una app de consumo de recursos minimos como es el caso
+     de la practica de todoey
+    */
+    let defaults = UserDefaults.standard
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -95,6 +102,13 @@ class TodoListViewController: UITableViewController {
             arriba ya que nos encontramos en un closure.
             */
             self.itemArray.append(textField.text!)
+            /*
+            Esta instruccion colocada a continuacion es lo que nos va a permitir guardar datos aun estando fuera de la aplicacion. con el uso
+            de la variable de tipo default que creamos antes lo que haremos sera guardar todo el itemArray[] dentro de ella. no olvidemos
+            utilizae el self. ya que estamos dentro de un closure.
+            */
+            self.defaults.set(self.itemArray, forKey: "TodoListArray") //Recuerda que aun se tiene que llamar la variable defaults. hay que ir a
+                                                                        //AppDelegate y a la hora de cargar la app imprimir la ruta de guardado.
             /*
             La siguiente linea de codigo hace que la informacion de la tableView se refresque en la Interfaz de usuario. ya que a la hora de añadir
             el nuevo elemento a la lista, esta se guarada a nivel memoria, sin embargo, la tabla permanece estatica hasta no indicarle que tiene

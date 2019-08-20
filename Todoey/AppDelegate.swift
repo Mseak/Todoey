@@ -16,6 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        /*
+        Esta linea de codigo hara que se imprima del directorio de documentos del usuario en turno la ultima direccion de momoria que utilizo
+        El programa en forma de String
+        */
+        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
+        
         return true
     }
 
