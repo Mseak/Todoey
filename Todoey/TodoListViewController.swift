@@ -26,6 +26,18 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        /*
+        En esta parte vamos a obtener la informacion de la lista guardada en la llave que creamos con la variable defaults con la
+        siguiente sentencia. OJO: Esto sirve debido a que nosotros tenemos en hardcode una lista y Xcode sabe que no encontrara
+        valores nulos pero si no hubiera items en la lista el programa crashearia. por lo que primero debemos poner una variable de prueba
+        y un if en caso de que no haya lista.
+        */
+        
+        if let item = defaults.array(forKey: "TodoListArray") as? [String]{
+            
+            itemArray = item
+        }
+        
     }
 
     //Mark - Table View Methods
