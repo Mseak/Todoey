@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Esta linea de codigo hara que se imprima del directorio de documentos del usuario en turno la ultima direccion de momoria que utilizo
         El programa en forma de String
         */
-        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
+       // print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
         
         return true
     }

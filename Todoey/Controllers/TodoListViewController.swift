@@ -26,11 +26,17 @@ class TodoListViewController: UITableViewController {
      informacion esta hecho para retener pequeños bancos de informacion en una app de consumo de recursos minimos como es el caso
      de la practica de todoey
     */
-    let defaults = UserDefaults.standard
-    
+    //NO NECESITAMOS ESTA DIRECCION DE USER DEFAULTS
+    //let defaults = UserDefaults.standard
+    //ESTA INSTRUCCION CREA UNA VARIABLE PARA CONTENER UNA RUTA DE ARCHIVOS DENTRO DE LAS CARPETAS DE ARCHIVOS COMPARTIDOS
+    //DE iOS
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print(dataFilePath!)
+        
         // Do any additional setup after loading the view.
         /*
         En esta parte vamos a obtener la informacion de la lista guardada en la llave que creamos con la variable defaults con la
@@ -49,23 +55,27 @@ class TodoListViewController: UITableViewController {
         }
         ****************************************************************************
         */
-        //ESTA ES LA FORMA EN LA QUE SE DECLARA LA NUEVA LISTA DE DEFAULTS CON OBJETOS DE TIPO ITEM
-        if let item = defaults.array(forKey: "TodoListArray") as? [Item]{
+        //ESTA ES LA FORMA EN LA QUE SE DECLARA LA NUEVA LISTA DE DEFAULTS CON OBJETOS DE TIPO ITEM ********<< TAMBIEN OBSOLETO >>********
+       /* if let item = defaults.array(forKey: "TodoListArray") as? [Item]{
             
             itemArray = item
-        }
-        
+         }
+        */
+       /*<<<<<<<<<<<<<<<<<< HA QUEDADO OBSOLETO AL USAR PERSISTENCIA DE DATOS CON NSCODER >>>>>>>>>>>>>>>>>>>>>>>>>>
         let newItem = Item()
         newItem.title = "Find Mike"
         itemArray.append(newItem)
         
         let newItem2 = Item()
-        newItem.title = "Buy Eggos"
+        newItem2.title = "Buy Eggos"
         itemArray.append(newItem2)
         
         let newItem3 = Item()
-        newItem.title = "Destroy Demogrogon"
+        newItem3.title = "Destroy Demogrogon"
         itemArray.append(newItem3)
+        */
+        
+        loadItems()
         
     }
 
@@ -141,8 +151,10 @@ class TodoListViewController: UITableViewController {
         Con esta linea imprimimos en consola el contenido de la variable local indexPath para comprobar que se entra dentro de este metodo y todo
         esta bien
         */
+        saveItems()
+        /* <<<<<<<<<<<<< RETIRAMOS ESTA LINEA PORQUE LA NUEVA FUNCION YA TIENE UN RELOAD ESCRITO >>>>>>>>>>>>>>>>>>
         tableView.reloadData()
-        
+        */
         print(itemArray[indexPath.row])
     }
     
@@ -190,14 +202,35 @@ class TodoListViewController: UITableViewController {
             de la variable de tipo default que creamos antes lo que haremos sera guardar todo el itemArray[] dentro de ella. no olvidemos
             utilizae el self. ya que estamos dentro de un closure.
             */
+            
+            /*************************<<<<<< ESTA LINEA TAMBIEN HA QUEDADO OBSOLETA >>>>>*****************************
             self.defaults.set(self.itemArray, forKey: "TodoListArray") //Recuerda que aun se tiene que llamar la variable defaults. hay que ir a
                                                                         //AppDelegate y a la hora de cargar la app imprimir la ruta de guardado.
+            */
+            
+            /****** <<<<<<<<< TODA ESTA SECCION SE MIGRARA A UNA NUEVA FUNCION DONDE SE SALVARAN TODOS LOS ATRIBUTOS EN LA PLIST >>>>>>  *******
+            // SE CREA UNA NUEVA VARIABLE LLAMADA ENCODER QUE NOS SERVERIA PARA EL NSCODER
+            
+            let encoder = PropertyListEncoder()
+            //LO SIGUIENTE (EL DO CATCH) LO TENEMOS QUE AGREGAR PORQUE XCODE NOS INDICA QUE PUEDEN SALIR ERRORES, POR LO TANTO PONEMOS LA INTRUCCION PARA INTENTE HACER EL COMANDO DE LO CONTRATIO ARROJAR EL ERROR.
+            do{
+                let data = try encoder.encode(self.itemArray)
+                try data.write(to: self.dataFilePath!)
+                
+            }catch {
+                print("Error encoding item array \(error)")
+                
+            }***********************************************************************************************************************************
+            */
+            
             /*
             La siguiente linea de codigo hace que la informacion de la tableView se refresque en la Interfaz de usuario. ya que a la hora de añadir
             el nuevo elemento a la lista, esta se guarada a nivel memoria, sin embargo, la tabla permanece estatica hasta no indicarle que tiene
             nuevo elemento que debe de mostrar.
+             
+             self.tableView.reloadData()
             */
-            self.tableView.reloadData()
+            self.saveItems()
             
             
         }
@@ -217,6 +250,51 @@ class TodoListViewController: UITableViewController {
         
     }
     
+    // Esta funcion salvara los items en la lista persistente de los documentos de la app en iOS
+    func saveItems(){
+        
+        // SE CREA UNA NUEVA VARIABLE LLAMADA ENCODER QUE NOS SERVERIA PARA EL NSCODER
+        
+        let encoder = PropertyListEncoder()
+        //LO SIGUIENTE (EL DO CATCH) LO TENEMOS QUE AGREGAR PORQUE XCODE NOS INDICA QUE PUEDEN SALIR ERRORES, POR LO TANTO PONEMOS LA INTRUCCION PARA INTENTE HACER EL COMANDO DE LO CONTRATIO ARROJAR EL ERROR.
+        do{
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+            
+        }catch {
+            print("Error encoding item array \(error)")
+            
+        }
+        self.tableView.reloadData()
+        
+    }
+    
+    //Esta funcion tratara de cargar los datos presistentes de la lista creada en los documentos de la app en iOS
+    func loadItems(){
+        
+        /*
+        creamos una variable llamada data que sera de tipo Data y que manda a lamar los contenidos de la plist indicada o de una URL externa
+        En este caso la plist indicada sera la variable que creamos arriba llamada dataFilePath.
+        como crear una variable tipo data nos puede traer un error, utilizamos el ya conocido arreglo de Try - Do - Catch
+        */
+        if let data = try? Data(contentsOf: dataFilePath!){
+            
+            //si se puede crear la variable data, creamos una variable decodificadora llamada decoder de tipo PropoertyListDecoder
+            //y despues le herdamos a itemArray los atributos de decoder para asi cargar los datos que fueron guardados en la plist.
+            
+            let decoder = PropertyListDecoder()
+             do {
+                
+                //<<<<<<<<<<<<<<<<<<<< PARA QUE ESTA INSTRUCCION FUNCIONE, SE TIENE QUE ESPECIFICAR EL PROTOCOLO "CODABLE" EN EL OBJETO ITEM
+                itemArray = try decoder.decode([Item].self, from: data)
+            }catch{
+                print("Error decoding itemArray \(error)")
+            }
+        }
+        
+        
+        
+    }
     
 }
 
