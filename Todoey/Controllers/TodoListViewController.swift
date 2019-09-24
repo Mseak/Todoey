@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import CoreData
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: UITableViewController{
     
     /*
     Definimos a variable de tipo arreglo con el cual introduciremos elementos a la tableview [OBSOLETO] - Leccion 239
@@ -30,12 +31,24 @@ class TodoListViewController: UITableViewController {
     //let defaults = UserDefaults.standard
     //ESTA INSTRUCCION CREA UNA VARIABLE PARA CONTENER UNA RUTA DE ARCHIVOS DENTRO DE LAS CARPETAS DE ARCHIVOS COMPARTIDOS
     //DE iOS
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
-
+    
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! OBSOLETO --->> SOLO NECESITABAMOS IMPRIMIR EL PATH DONDE CAERA LA INFORMACION
+    //let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+    
+    //EL SIGUIENTE CODIGO VA A REEMPLAZAR NUESTRA FORMA DE GUARDAR INFORMACION DENTRO DE LA PLIST. AHORA, VAMOS A UTILIZAR
+    //CORE DATA, ENTONCES NECESITAMOS CREAR UNA VARIABLE CONTEXT Y UNA VARIABLE DE TIPO CORE DATA QUE SERA NUESTRO SUSTITUO DE
+    //ITEM. EL CODIGO DE NUESTRA CLASE ITEM FUE BORRADO Y ESTA OBSOLETO. ------>
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(dataFilePath!)
+        //print(dataFilePath!)
+        
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         // Do any additional setup after loading the view.
         /*
@@ -75,7 +88,7 @@ class TodoListViewController: UITableViewController {
         itemArray.append(newItem3)
         */
         
-        loadItems()
+       loadItems()
         
     }
 
@@ -138,6 +151,13 @@ class TodoListViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
+        //*************************************** El CODIGO ABAJO ES EXPERIMENTAL Y MUESTRA EL ORDEN Y LA SINTAXIS PARA
+        //                                        PARA BORRAR ITEMS DE LA BASE DE DATOS Y DE LA TABLE VIEW *************************************
+        
+        //context.delete(itemArray[indexPath.row]) ----->>> primero removemos el item de la base de datos
+        //itemArray.remove(at: [indexPath.row]) -------->>> despues removemos el item del arreglo de objetos
+        
+        
         /*************************EL CODIGO ABAJO QUEDA OBSOLETO CON EL CAMBIO A UN ARREGLO DE OBJETOS**************************
          El siguiente if es el que no permite revisar si el item de la lista tiene ya un checkmark al ser tocado y si lo tiene,
          Quitar el checkmark. si no lo tiene al momento de ser tocado le coloca el checkmark
@@ -177,13 +197,23 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
           //MARK - Codigo para cuando se presiona el boton de Add Item
             
+            
+            
             /*
             Suplantamos el codigo creado para un arreglo de Strings y en su lugar se utilizara logica
             para un arreglo de objetos
-            */
-            
+             >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ESTA DECLARACION DEL OBJETO newItem A QUEDADO OBSOLETA. YA NO ETAMOS USANDO
+                                               PLIST LOCAL, AHORA ESTAMOS USANDO CORE DATA. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             let newItem = Item()
+            */
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            
+            // COMO LA FORMA DE SALVAR LOS NUEVOS ITEMS HA CAMBIADO A CORE DATA Y DENTRO DE ESE DATA MODEL TENEMOS QUE EL ATRIBUTO
+            // DE "DONE" ES OBLIGATORIO, ENTONCES DEBEMOS SETEARLO AQUI EN FALSO SIEMPRE, YA QUE NINGUNA TAREA DEBE EMPEZAR HECHA.
+            
+            newItem.done = false
+            
             
             //********************CODIGO HA QUEDADO OBSOLOTO - LA FORMA DE AÑADIR ITEMS CAMBIO DE STRINGS A OBJETOS******************************
             
@@ -254,15 +284,20 @@ class TodoListViewController: UITableViewController {
     func saveItems(){
         
         // SE CREA UNA NUEVA VARIABLE LLAMADA ENCODER QUE NOS SERVERIA PARA EL NSCODER
-        
-        let encoder = PropertyListEncoder()
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!! YA NO NECESITAMOS ESTE ENCODER AHORA QUE ESTAMOS USANDO COREDATA !!!!!!!!!!!!!!!!!!!!!
+        //let encoder = PropertyListEncoder()
         //LO SIGUIENTE (EL DO CATCH) LO TENEMOS QUE AGREGAR PORQUE XCODE NOS INDICA QUE PUEDEN SALIR ERRORES, POR LO TANTO PONEMOS LA INTRUCCION PARA INTENTE HACER EL COMANDO DE LO CONTRATIO ARROJAR EL ERROR.
         do{
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            //let data = try encoder.encode(itemArray)  -->>> OBSOLETO CON CORE DATA
+            //try data.write(to: dataFilePath!)   ----->>> OBSOLETO CON CORE DATA
+            
+            //INVOCAMOS EL METODO QUE NOS PROVEE XCODE PARA SALVAR A LA BASE DE DATOS
+            try context.save()
             
         }catch {
-            print("Error encoding item array \(error)")
+            //print("Error encoding item array \(error)")
+            // ATRAPAMOS EL ERROR QUE GENERE EL METODO COTEXT.SAVE
+            print("Error saving context \(error)")
             
         }
         self.tableView.reloadData()
@@ -270,6 +305,9 @@ class TodoListViewController: UITableViewController {
     }
     
     //Esta funcion tratara de cargar los datos presistentes de la lista creada en los documentos de la app en iOS
+    
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   ESTA FUNCION QUEDO OBSOLETA CUANDO CAMBIAMOS DE ENCODER A DATA MODEL !!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /*
     func loadItems(){
         
         /*
@@ -295,6 +333,110 @@ class TodoListViewController: UITableViewController {
         
         
     }
+     */
+    
+    // >>>>>>>>>>>>>>>>>>>>> CREAMOS DE NUEVO LA FUNCION DE CARGA DE DATOS PERO AHORA CON METODOLOGIA CORE DATA Y NO CON ENCODING <<<<<<<<<
+    //  SEGUNDA MODIFICACION : Como podemos observar la funcion de load puede servirnos tanto como para hacer busquedas totales como tambien
+    //  para hacer las busquedas de la searchbar por lo tanto añadimos un parametro externo 'With' y uno interno 'request' y ademas
+    //  añadimos un valor default para la invocacion que tenemos en el metodo didFinishedLoading
+    
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()){
+        
+        //let request : NSFetchRequest<Item> = Item.fetchRequest()
+        do{
+           itemArray = try context.fetch(request)
+            
+        }catch{
+            
+            print("Error fetching data from context issue : \(error)")
+        }
+        
+        tableView.reloadData()
+    }
+    
+    
     
 }
 
+// !!!!!!!!!!!!!!!!!!! ESTAMOS UTILIZANDO LA PALABRA RESERVADA EXTENSION PARA ASI DECLARAR QUE NECESITAMOS LAS FUNCIONALIDADES DE
+//                     DE LA BARRA DE BUSQUEDA SIN TENER QUE DECLARARLO EN LA FUNCION PRINCIPAL. ESTO AYUDA A TENER EL CODIGO MEJOR
+//                     SECCIONADO PARA IDENTIFICAR QUE SECCIONES LLEVAN A CABO FUNCIONES QUE SE REQUIERAN INSPECCIONAR.
+//                     ESTO APLICA PARA CUALQUIER DELEGATE DE OTROS TIPOS COMO PICKER VIEWS ETC. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// MARK: - Search bar methods
+
+extension  TodoListViewController :  UISearchBarDelegate {
+    
+    //!!!!!!!!!!!!!!!! TODO ESTE BLOQUE DE CODIGO ES COMO ORIGINALMENTE SE PLANEO PERO HACIENDO REFACTOR PUEDE QUEDAR MAS COMPACTO
+    //                 DESPUES DEL CODIGO COMENTADO SIGUE EL REFACTOR
+    /*
+    // Esta funcion es la que necesitamos para insertar logica cuando el usuario toque la barra de busqueda
+   
+        
+        // Definimos una variable interna de busqueda con la sintaxis de core Data NSfetchRequest<Tipo de item que se va a recueerar>  = Variable.FetchRequest()
+        
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        print(searchBar.text!)
+        
+        //Con la siguiente sentencia vamos a crear un 'Predicate', esto es equivalente un query dentro de nuestro core data model.
+        // la sintaxis es let predicate = NSPredicate.init(format: "AQUI VA EL QUERY", Args (Argumentos o parametros de busqueda))
+        
+        let predicate = NSPredicate.init(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        
+        // Ahora que tenemos armado el predicate, podemos asignarle a la variable request su predicate
+        request.predicate = predicate
+        
+        // podemos añadirle a la busqueda funcionalidad de ordenamiento de datos, creando una variable de tipo NSsortDescriptor
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptor]
+        
+        //Ahora que tenemos armado nuestro query completo es hora de invocarlo, y para esto podemos pedir prestado el codigo de la funcion anterior
+        //load items porque en esa funcion tenemos ya codigo que sirve para hacer el fetch request.
+        
+        do{
+            itemArray = try context.fetch(request)
+            
+        }catch{
+            
+            print("Error fetching data from context issue : \(error)")
+        }
+        
+        // reload tableView
+        tableView.reloadData()
+        */
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+       
+            let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+            request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+            request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+            
+            loadItems(with: request)
+        
+            //tableView.reloadData()
+    }
+    //Esta Funcion Sirve para regresar la vista de la tabla completa sin filtro
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        //Utilizamos un if simple para determinar si es necesario limpiar la busqueda
+        //En este caso si observamos que la cadena de caracteres tiene una extension de cero
+        //letras, podemos asumir que la busqueda se borro y es necesario revertir el filtro.
+        if searchBar.text?.count == 0{
+            
+            loadItems()
+            
+            //Despues de limpiar la busqueda, utilizamos la funcion de abajo para despojar
+            //a la barra de busqueda del focus del procesamiento, esto para despedir al teclado
+            //y quitar el cursor de la barra de busqueda
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            
+        }
+
+    }
+}
