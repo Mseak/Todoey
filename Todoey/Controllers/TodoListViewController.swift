@@ -92,7 +92,7 @@ class TodoListViewController: UITableViewController{
         
     }
 
-    //Mark - Table View Methods
+    //MARK: - tableView Methods
     
     /*
      Este metodo contiene el codigo necesario para recuperar el contenido de la tableView y obtener el siguiente numero de la lista de Items
@@ -128,8 +128,8 @@ class TodoListViewController: UITableViewController{
         return cell
         
     }
-    /*MARK -Table View Delegates
-    /Este metodo crea un manejador para hacer una accion cuando un item de la lista del table view sea seleccionado, en este caso
+    //MARK: -Table View Delegates
+    /*Este metodo crea un manejador para hacer una accion cuando un item de la lista del table view sea seleccionado, en este caso
     /se colocara una marca de check cada vez que el item sea tocado
     /
     /se declara el metodo a continuacion con el parametro de didSelectRow
@@ -179,7 +179,7 @@ class TodoListViewController: UITableViewController{
     }
     
     
-    //MARK - Add New Items Section
+    //MARK: - Add New Items Section
     
     //Esta funcion hace el mapeo del signo de mas en la interfaz de la app
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -195,7 +195,7 @@ class TodoListViewController: UITableViewController{
         //Esta instruccion me crea una accion que el programa hara cuando mi boton de + se presione y que añadira un nuevo item a mi col
         //de todoey
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-          //MARK - Codigo para cuando se presiona el boton de Add Item
+          //MARK: - Codigo para cuando se presiona el boton de Add Item
             
             
             
