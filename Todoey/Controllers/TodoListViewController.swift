@@ -22,6 +22,17 @@ class TodoListViewController: UITableViewController{
     
     var itemArray = [Item]()
     
+    
+    /*
+    Vamos a declarar una nueva variable llamada selectedCategory que nos agrupara todos los items.
+    */
+    var selectedCategory : Category2? {
+     
+        didSet{
+            loadItems()
+        }
+    }
+    
     /*
      La siguiente Variable esta creada para iniciar la clase acerca de informacion persistente. este metodo de retencion de
      informacion esta hecho para retener pequeños bancos de informacion en una app de consumo de recursos minimos como es el caso
@@ -88,8 +99,11 @@ class TodoListViewController: UITableViewController{
         itemArray.append(newItem3)
         */
         
-       loadItems()
+    /*ahora el load items se manda a llamar en la parte de arriba del codigo en el variable selectedCategory en cuanto esta recibe un valor*/
         
+      /*
+       loadItems()
+        */
     }
 
     //MARK: - tableView Methods
@@ -208,6 +222,8 @@ class TodoListViewController: UITableViewController{
             */
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            
+            newItem.parentCategory = self.selectedCategory
             
             // COMO LA FORMA DE SALVAR LOS NUEVOS ITEMS HA CAMBIADO A CORE DATA Y DENTRO DE ESE DATA MODEL TENEMOS QUE EL ATRIBUTO
             // DE "DONE" ES OBLIGATORIO, ENTONCES DEBEMOS SETEARLO AQUI EN FALSO SIEMPRE, YA QUE NINGUNA TAREA DEBE EMPEZAR HECHA.
@@ -340,9 +356,25 @@ class TodoListViewController: UITableViewController{
     //  para hacer las busquedas de la searchbar por lo tanto añadimos un parametro externo 'With' y uno interno 'request' y ademas
     //  añadimos un valor default para la invocacion que tenemos en el metodo didFinishedLoading
     
-    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()){
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
         
         //let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        //Este codigo sirve para armar el query que incluye la busqueda de los Items que contiene la categoria seecciona
+        //al poner el codigo asi, le damos un valor por default al predicado de los items y asi podemos utilizar el loaditems
+        //sin necesidad de poner valores para invcar la funcion.
+         let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let additionalPredicate = predicate{
+            
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+            
+        }else{
+            
+            request.predicate = categoryPredicate
+            
+        }
+        
         do{
            itemArray = try context.fetch(request)
             
@@ -411,11 +443,12 @@ extension  TodoListViewController :  UISearchBarDelegate {
        
             let request : NSFetchRequest<Item> = Item.fetchRequest()
         
-            request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+            let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
             request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
             
-            loadItems(with: request)
+            loadItems(with: request,  predicate: predicate)
+        
         
             //tableView.reloadData()
     }

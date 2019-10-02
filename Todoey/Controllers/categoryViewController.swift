@@ -19,7 +19,7 @@ class categoryViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadItems()
+        loadCategories()
 
      
     }
@@ -78,7 +78,26 @@ class categoryViewController: UITableViewController {
         
     }
     
-   
+     //MARK: - TableView Delegate Methods
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        performSegue(withIdentifier: "goToItems", sender: self)
+        
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let destinationVC = segue.destination as! TodoListViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow{
+            
+            destinationVC.selectedCategory = categories[indexPath.row]
+            
+        }
+    }
+    
+    
      //MARK: - Data Manipulation Methods
        /*
         Esta Funcion es para salvar los datos en la tabla una vez añadidos
@@ -97,7 +116,7 @@ class categoryViewController: UITableViewController {
           /*
           Funcion para cargar la tabla
           */
-    func loadItems(with request : NSFetchRequest<Category2> = Category2.fetchRequest()){
+    func loadCategories(with request : NSFetchRequest<Category2> = Category2.fetchRequest()){
               
               do {
                   categories = try context2.fetch(request)
@@ -108,7 +127,7 @@ class categoryViewController: UITableViewController {
     }
           
     
-    //MARK: - TableView Delegate Methods
+   
     
    
     
