@@ -7,15 +7,14 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 
 class categoryViewController: UITableViewController {
     
-    var categories = [Category2]()
-    let context2 = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    
+    let realm = try! Realm()
+    var categories: Results<Category>?
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -32,12 +31,11 @@ class categoryViewController: UITableViewController {
         
         let action2 = UIAlertAction(title: "Add", style: .default) { (action2) in
             
-            let newCategory = Category2(context: self.context2)
+            let newCategory = Category()
+            newCategory.name = textfield2.text!
             
-            newCategory.name = textfield2.text
-            
-            self.categories.append(newCategory)
-             self.saveCategories()
+       
+            self.save(category: newCategory)
         }
         
         
@@ -57,22 +55,18 @@ class categoryViewController: UITableViewController {
     
     //MARK: - TableView Data Source Method
 
-    /*
-    Funcion para cargar el numero de objetos en la tabla
-    */
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        return categories?.count ?? 1
     }
      
-    /*
-    Esta Funcion Abajo es para obtener el texto de la tabla de category
-    */
+  
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
-        let category = categories[indexPath.row]
+        //let category = categories[indexPath.row]
         
-        cell.textLabel?.text = category.name
+        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories Added Yet"
         
         return cell
         
@@ -92,20 +86,20 @@ class categoryViewController: UITableViewController {
         
         if let indexPath = tableView.indexPathForSelectedRow{
             
-            destinationVC.selectedCategory = categories[indexPath.row]
+            destinationVC.selectedCategory = categories?[indexPath.row]
             
         }
     }
     
     
      //MARK: - Data Manipulation Methods
-       /*
-        Esta Funcion es para salvar los datos en la tabla una vez añadidos
-       */
-    func saveCategories(){
+      
+    func save(category : Category){
               
               do{
-                  try context2.save()
+                try realm.write {
+                    realm.add(category)
+                }
               }catch{
                   print("Error While Saving Categories: \(error)")
               }
@@ -113,17 +107,14 @@ class categoryViewController: UITableViewController {
               
     }
           
-          /*
-          Funcion para cargar la tabla
-          */
-    func loadCategories(with request : NSFetchRequest<Category2> = Category2.fetchRequest()){
-              
-              do {
-                  categories = try context2.fetch(request)
-              }catch{
-                  print("Error fetching data from context issue : \(error)")
-              }
-              tableView.reloadData()
+         
+    func loadCategories(){
+        
+            categories = realm.objects(Category.self)
+        
+            tableView.reloadData()
+         
+    
     }
           
     
