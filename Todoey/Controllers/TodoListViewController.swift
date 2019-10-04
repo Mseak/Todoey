@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController{
+class TodoListViewController: SwipeTableViewController{
     
     var todoItems: Results<Item>?
     
@@ -21,11 +21,13 @@ class TodoListViewController: UITableViewController{
             
             loadItems()
         }
+        
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
+        loadItems()
+        tableView.rowHeight = 80.0
         
     }
 
@@ -37,7 +39,10 @@ class TodoListViewController: UITableViewController{
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
+        //let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        
         if let item = todoItems?[indexPath.row]{
             
             cell.textLabel?.text = item.title
@@ -111,16 +116,35 @@ class TodoListViewController: UITableViewController{
      //MARK: - Load Items con Realm
     func loadItems(){
         
-        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
-     
+        //todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        todoItems = realm.objects(Item.self)
+        
         tableView.reloadData()
     }
     
     
+    override func updateModel(at indexPath: IndexPath) {
+           
+        if let itemDeletion = self.todoItems?[indexPath.row]{
+          
+            do{
+                try realm.write {
+                    self.realm.delete(itemDeletion)
+                }
+                
+            }catch{
+                
+                print("Error while deleting object \(error)")
+            }
+            
+       }
     
+    
+    
+    }
 }
-
-// MARK: - Search bar methods - OBSOLETO CON EL USO DE REALM
+    
+// MARK: - Search bar methods
 
 extension  TodoListViewController :  UISearchBarDelegate {
     
@@ -143,4 +167,8 @@ extension  TodoListViewController :  UISearchBarDelegate {
         }
 
     }
+    
+   
+    
+    
 }

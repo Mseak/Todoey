@@ -16,6 +16,7 @@
 		B6A331B2230B003D00546372 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6A331B0230B003D00546372 /* LaunchScreen.storyboard */; };
 		B6C629382345151A00229501 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C629372345151A00229501 /* Item.swift */; };
 		B6C6293A2345152300229501 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C629392345152300229501 /* Category.swift */; };
+		B6E07F2C23469874004F57FD /* SwipeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E07F2B23469874004F57FD /* SwipeTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		B6A331B3230B003D00546372 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6C629372345151A00229501 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		B6C629392345152300229501 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		B6E07F2B23469874004F57FD /* SwipeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 			children = (
 				B69AA4F8233A590E0056CED6 /* categoryViewController.swift */,
 				B6A331A9230B003A00546372 /* TodoListViewController.swift */,
+				B6E07F2B23469874004F57FD /* SwipeTableViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -248,6 +251,7 @@
 				B69AA4F9233A590E0056CED6 /* categoryViewController.swift in Sources */,
 				B6A331AA230B003A00546372 /* TodoListViewController.swift in Sources */,
 				B6A331A8230B003A00546372 /* AppDelegate.swift in Sources */,
+				B6E07F2C23469874004F57FD /* SwipeTableViewController.swift in Sources */,
 				B6C6293A2345152300229501 /* Category.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
