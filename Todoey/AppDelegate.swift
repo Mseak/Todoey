@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        print(Realm.Configuration.defaultConfiguration.fileURL)
+        //print(Realm.Configuration.defaultConfiguration.fileURL)
         
         // MARK: - Creamos una nueva instancia de REALM
         //crearla puede generar error por lo que se inicializa utilizando un DO TRY CATCH block

@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class TodoListViewController: SwipeTableViewController{
     
@@ -28,6 +29,9 @@ class TodoListViewController: SwipeTableViewController{
         
         loadItems()
         tableView.rowHeight = 80.0
+        tableView.separatorStyle = .none
+        
+        
         
     }
 
@@ -48,9 +52,27 @@ class TodoListViewController: SwipeTableViewController{
             cell.textLabel?.text = item.title
             cell.accessoryType = item.done ? .checkmark : .none
             
+            if indexPath.row == 0{
+                
+                cell.backgroundColor = UIColor(hexString: item.cellColorHexValue)
+            }else{
+                
+                let color = UIColor(hexString: item.cellColorHexValue)?.darken(byPercentage: CGFloat(indexPath.row)/CGFloat(todoItems!.count))
+                cell.backgroundColor = color
+                    cell.textLabel?.textColor = ContrastColorOf(color!, returnFlat: true)
+            }
+            
+           // if let color = FlatWatermelon().darken(byPercentage: CGFloat(indexPath.row)/CGFloat(todoItems!.count)){
+                
+              //  cell.backgroundColor = color
+              //  cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+            //}
+            
+            
         }else{
             cell.textLabel?.text = "No items added"
         }
+        
          return cell
     }
     //MARK: -Table View Delegates
@@ -63,6 +85,7 @@ class TodoListViewController: SwipeTableViewController{
             do {
                     try realm.write {
                         item.done = !item.done
+                        
                 }
             
             }catch{
@@ -80,8 +103,8 @@ class TodoListViewController: SwipeTableViewController{
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
-        var textField = UITextField()
         
+        var textField = UITextField()
         
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
        
@@ -95,6 +118,7 @@ class TodoListViewController: SwipeTableViewController{
                         let newItem = Item()
                         newItem.title = textField.text!
                         newItem.dateCreated = Date.init()
+                        newItem.cellColorHexValue = self.selectedCategory!.cellColorHexValue
                         currentCategory.items.append(newItem)
                     }
                 }catch{
@@ -116,8 +140,8 @@ class TodoListViewController: SwipeTableViewController{
      //MARK: - Load Items con Realm
     func loadItems(){
         
-        //todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
-        todoItems = realm.objects(Item.self)
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        //todoItems = realm.objects(Item.self)
         
         tableView.reloadData()
     }

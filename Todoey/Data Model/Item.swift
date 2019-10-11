@@ -15,6 +15,7 @@ class Item: Object {
     @objc dynamic var title : String = ""
     @objc dynamic var done : Bool = false
     @objc dynamic var dateCreated : Date?
+    @objc dynamic var cellColorHexValue : String = ""
     
     
     //MARK: - Referencia a la Entidad Padre Category

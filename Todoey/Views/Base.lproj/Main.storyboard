@@ -10,7 +10,7 @@
         <!--Todoey-->
         <scene sceneID="0oO-a2-MtY">
             <objects>
-                <tableViewController id="aDy-Gu-GoM" customClass="categoryViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="aDy-Gu-GoM" customClass="categoryViewController" customModule="Todoey" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Z5j-0P-Vda">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -30,7 +30,7 @@
                             <outlet property="delegate" destination="aDy-Gu-GoM" id="fCM-rE-jio"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="ELV-Mb-JqN">
+                    <navigationItem key="navigationItem" title="Todoey" largeTitleDisplayMode="always" id="ELV-Mb-JqN">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Fzw-my-chy">
                             <color key="tintColor" red="0.97862993060772974" green="1" blue="0.91020961713239024" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -78,7 +78,7 @@
                         </connections>
                     </tableView>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Items" id="kUr-N3-qpt">
+                    <navigationItem key="navigationItem" title="Items" largeTitleDisplayMode="always" id="kUr-N3-qpt">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="UY1-ro-i1h">
                             <color key="tintColor" red="0.97150950309999995" green="1" blue="0.97679439469999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -97,12 +97,14 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="OQd-bw-ROq" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Hg1-Fg-1IC">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="Hg1-Fg-1IC">
+                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="barTintColor" red="0.19172658291259559" green="0.69319063361196398" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.1917265829" green="0.69319063359999999" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="barTintColor" red="0.1917265829" green="0.69319063359999999" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <textAttributes key="titleTextAttributes">
-                            <color key="textColor" red="0.9715095031476646" green="1" blue="0.9767943947308968" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
